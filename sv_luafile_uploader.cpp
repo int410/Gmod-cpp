@@ -3,51 +3,59 @@
 
 #include <fstream>
 #include <string>
+
 #include "Interface.h"
+
+#define CLua( _function ) int _function( lua_State* state )
+#define PushCLua( _function, name ) LUA->PushCFunction(_function); LUA->SetField(-2, name);
 
 const char* addpath(const char* name)
 {
 	return ("garrysmod/addons/wbid_test/lua/_base/" + (std::string)name + ".lua").c_str();
 }
 
-int upload(lua_State* state)
+CLua (f_upload)
 {
 	LUA->CheckType(1, GarrysMod::Lua::Type::STRING); 
 	LUA->CheckType(2, GarrysMod::Lua::Type::STRING);
 
 	std::ofstream out( addpath(LUA->GetString(2)) );
 	out << LUA->GetString(1);
+	out.close();
 
 	return 0;
 } 
 
-int remove(lua_State* state)
+CLua (f_remove)
 {
 	LUA->CheckType(1, GarrysMod::Lua::Type::STRING);
 
-	LUA->PushNumber( remove(addpath(LUA->GetString(1))) );
+	LUA->PushNumber( std::remove(addpath(LUA->GetString(1))) );
 
 	return 1;
 }
 
-int rename(lua_State* state)
+CLua (f_rename)
 {
 	LUA->CheckType(1, GarrysMod::Lua::Type::STRING);
 	LUA->CheckType(2, GarrysMod::Lua::Type::STRING);
 
-	LUA->PushNumber( rename(addpath(LUA->GetString(1)), addpath(LUA->GetString(2))) );
+	LUA->PushNumber( std::rename(addpath(LUA->GetString(1)), addpath(LUA->GetString(2))) );
 
 	return 1;
 }
 
+
 GMOD_MODULE_OPEN()
 {	
 	LUA->PushSpecial(GarrysMod::Lua::SPECIAL_GLOB); 
+
 		LUA->CreateTable();
-		LUA->PushCFunction(upload); LUA->SetField(-2, "create");
-		LUA->PushCFunction(remove); LUA->SetField(-2, "delete");
-		LUA->PushCFunction(rename); LUA->SetField(-2, "rename");
+			PushCLua(f_upload, "create");
+			PushCLua(f_remove, "delete");
+			PushCLua(f_rename, "rename");
 		LUA->SetField(-2, "upload");
+
 	LUA->Pop(); 
 
 	return 0;
