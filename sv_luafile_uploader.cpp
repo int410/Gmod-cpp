@@ -7,7 +7,7 @@
 #include "Interface.h"
 
 #define CLua( _function ) int _function( lua_State* state )
-#define PushCLua( _function, name ) LUA->PushCFunction(_function); LUA->SetField(-2, name);
+#define PushCLua( _function, _name ) LUA->PushCFunction(_function); LUA->SetField(-2, _name);
 
 const char* addpath(const char* name)
 {
