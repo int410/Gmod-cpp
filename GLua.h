@@ -5,6 +5,12 @@
 #include <Windows.h>
 #include <string>
 
+#define lua_pop(L,n) lua_settop(L, -(n)-1) 
+#define RUNSTRINGEX 111 // hook all lua
+#define RUNSTRING 92 // hook only LuaCmd
+#define FINDANDRUN 97 // hook openfile
+#define INIT 55 // post state created
+
 class ILuaShared;
 class IThreadedCall;
 class ILuaGameCallback;
